@@ -1,4 +1,4 @@
-f=imread('53.bmp');
+f=imread('13.bmp');
 g=f(70:730,206:818);
 g_adjust=histeq(g,256);
 sum_row=sum(g,2);

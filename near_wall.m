@@ -1,4 +1,4 @@
-f1=imread('53.bmp');
+f1=imread('23.bmp');
 f1=f1(70:730,206:818);
 sum_row=sum(f1,2);
 [pks,loc]=findpeaks(sum_row);
@@ -20,8 +20,15 @@ for i=1:num
     len(i)=length(idx{i});
 end
 [sl,id1]=sort(len,'descend');
+len_av=mean(len);
+is_large=sl>=mean(len);
+id1_large=id1.*is_large;
 g3=zeros(size(g2));
-g3(idx{id1(1)})=1; 
+for i=1:length(id1_large)
+    if id1_large(i)>0
+        g3(idx{id1(i)})=1; 
+    end
+end
 g4=bwmorph(g3,'thin',inf);
 g5=zeros(size(g4));
 for i=1:size(g4,2)
