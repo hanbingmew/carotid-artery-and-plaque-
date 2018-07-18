@@ -1,13 +1,7 @@
-f1=imread('58.bmp');
+f1=imread('22.bmp');
 f1=f1(70:730,206:818);
-sum_row=sum(f1,2);
-[pks,loc]=findpeaks(sum_row);
-[sp,ind1]=sort(pks,'descend');
-loc1=loc(ind1(1));
-loc2=loc(ind1(2));
 w=fspecial('average',3);
 fa=imfilter(f1,w,'replicate');
-fa=fa(min(loc1,loc2)-10:max(loc1,loc2)+10,:);
 T=graythresh(fa);
 g=im2bw(fa,T);
 g1=edge(g,'sobel','horizontal');
@@ -108,13 +102,11 @@ end
 g11=g9 | g10;
 f2=zeros(size(f1));    
 f3=f2;
-f2(min(loc1,loc2)-10:max(loc1,loc2)+10,:)=g9;
-f3(min(loc1,loc2)-10:max(loc1,loc2)+10,:)=g10;
+f2=g9;
+f3=g10;
 [r1,c1]=find(f2==1);
 [r2,c2]=find(f3==1);
 imshow(f1);
 hold on
 plot(c1,r1,'r');
 plot(c2,r2,'r');
-        
-    
