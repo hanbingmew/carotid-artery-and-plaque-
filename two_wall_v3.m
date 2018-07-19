@@ -1,3 +1,4 @@
+clear;
 f1=imread('59.bmp');
 f1=f1(70:730,206:818);
 w=fspecial('average',3);
