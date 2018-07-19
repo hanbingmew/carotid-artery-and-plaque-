@@ -1,12 +1,12 @@
-f1=imread('19.bmp');
+f1=imread('57.bmp');
 f1=f1(70:730,206:818);
 w=fspecial('average',3);
 fa=imfilter(f1,w,'replicate');
 T=graythresh(fa);
 g=im2bw(fa,T);
-g1=edge(g,'sobel','horizontal');
-g2=imdilate(g1,ones(3,3));
-[L,num]=bwlabel(g2);
+g1=edge(g,'canny');
+g1=bwmorph(g1,'thin',inf);
+[L,num]=bwlabel(g1);
 len=zeros(num,1);
 for i=1:num
     idx{i}=find(L==i);
@@ -16,37 +16,72 @@ end
 len_av=mean(len);
 is_large=sl>=mean(len);
 id1_large=id1.*is_large;
-g3=zeros(size(g2));
+g2=zeros(size(g1));
 idx1=cell(sum(is_large),1);
 for i=1:length(id1_large)
     if id1_large(i)>0
-        g3(idx{id1(i)})=1; 
+        g2(idx{id1(i)})=1; 
         idx1{i}=idx{id1(i)};
     end
 end
-idx2=cell(sum(is_large),1);
-for i=1:sum(is_large)
-    [I,J]=ind2sub(size(g2),idx1{i});
-    idx2{i}=[I,J];
+ep=endpoints(g2);
+[lox,loy]=find(ep==1);
+lox=int16(lox);
+loy=int16(loy);
+for i=1:length(lox)
+    t1=lox(i);
+    t2=loy(i);
+    if ((5<t1) && (t1<size(ep,1)-5) && (10<t2) && (t2<size(ep,2)-10) && (ep(t1,t2)==1))
+       patch=ep(t1-4:t1+4,t2-4:t2+4);
+       ep(t1,t2)=0;
+       patch(5,5)=0;
+       [neighx,neighy]=find(patch==1);
+       if ~isempty(neighx)
+           rx=neighx-5;
+           ry=neighy-5;
+           [min_d,l]=min(abs(rx)+abs(ry));
+           rx=rx(l);
+           ry=ry(l);
+           locx=t1+rx;
+           locy=t2+ry;
+           [x,y]=intline(t1,locx,t2,locy);
+           for k=1:length(x)
+            g2(x(k),y(k))=1;
+           end
+           for j=1:length(lox)
+               if lox(j)==locx && loy(j)==locy;
+                   lox(j)=0;
+                   loy(j)=0;
+               end
+           end
+       end
+   end
+end
+    
+g4=zeros(size(g2));
+[Lc,numc]=bwlabel(g2);
+idx2=cell(numc,1);
+for i=1:numc
+    idx2{i}=find(Lc==i);
+    [I,J]=ind2sub(size(g1),idx2{i});
     if max(J)-min(J)<0.8*size(g2,2)
         idx2{i}=[];
     end
 end
 count=1;
-for i=1:sum(is_large)
-    if ~isequal(idx2{i},[])
-        idx3{count}=sub2ind(size(g2),idx2{i}(:,1),idx2{i}(:,2));
+for i=1:length(idx2)
+    if ~isempty(idx2{i})
+        idx3{count}=sub2ind(size(g1),idx2{i});
         count=count+1;
     end
 end
-g4=zeros(size(g3));
 loc=zeros(length(idx3),1);
 for i=1:length(idx3)
     g4(idx3{i})=1;
-    [I,J]=ind2sub(size(g2),idx3{i});
+    [I,J]=ind2sub(size(g1),idx3{i});
     idx3{i}=[I,J];
     loc(i)=mean(I);
-    idx3{i}=sub2ind(size(g2),idx3{i}(:,1),idx3{i}(:,2));
+    idx3{i}=sub2ind(size(g1),idx3{i}(:,1),idx3{i}(:,2));
 end
 [sloc,id2]=sort(loc);
 sloc_d=diff(sloc);
