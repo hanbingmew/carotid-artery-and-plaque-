@@ -1,10 +1,11 @@
-f1=imread('15.2.bmp');
+f1=imread('17.bmp');
 f1=f1(70:730,206:818);
 w=fspecial('average',3);
 fa=imfilter(f1,w,'replicate');
 T=graythresh(fa);
 g=im2bw(fa,T);
 g1=edge(g,'canny');
+g1=bwmorph(g1,'thin',inf);
 [L,num]=bwlabel(g1);
 len=zeros(num,1);
 for i=1:num
@@ -23,21 +24,6 @@ for i=1:length(id1_large)
         idx1{i}=idx{id1(i)};
     end
 end
-% idx2=cell(sum(is_large),1);
-% for i=1:sum(is_large)
-%     [I,J]=ind2sub(size(g1),idx1{i});
-%     idx2{i}=[I,J];
-%     if max(J)-min(J)<0.8*size(g1,2)
-%         idx2{i}=[];
-%     end
-% end
-% count=1;
-% for i=1:sum(is_large)
-%     if ~isequal(idx2{i},[])
-%         idx3{count}=sub2ind(size(g1),idx2{i}(:,1),idx2{i}(:,2));
-%         count=count+1;
-%     end
-% end
 ep=endpoints(g2);
 [lox,loy]=find(ep==1);
 lox=int16(lox);
@@ -77,9 +63,16 @@ g4=zeros(size(g2));
 idx2=cell(numc,1);
 for i=1:numc
     idx2{i}=find(Lc==i);
-    [I,J]=ind2sub(idx2{i});
+    [I,J]=ind2sub(size(g1),idx2{i});
     if max(J)-min(J)<0.8*size(g2,2)
         idx2{i}=[];
+    end
+end
+count=1;
+for i=1:length(idx2)
+    if ~isempty(idx2{i})
+        idx3{count}=sub2ind(size(g1),idx2{i});
+        count=count+1;
     end
 end
 loc=zeros(length(idx3),1);
@@ -110,19 +103,19 @@ id5=sub2ind(size(g6),I2,J2);
 g8(id5)=1;
 g9=zeros(size(g6));
 g10=g9;
-if m1<m2
+if m1<m2`
     for i=1:size(g7,2)
         col_vec_1=g7(:,i);
         m_1=max(col_vec_1);
         if m_1==1
             id5=find(col_vec_1==1);
-            g9(min(id5),i)=1;
+            g9(max(id5),i)=1;
         end
         col_vec_2=g8(:,i);
         m_2=max(col_vec_2);
         if m_2==1
             id6=find(col_vec_2==1);
-            g10(max(id6),i)=1;
+            g10(min(id6),i)=1;
         end
     end
 else 

@@ -1,4 +1,4 @@
-f1=imread('57.bmp');
+f1=imread('59.bmp');
 f1=f1(70:730,206:818);
 w=fspecial('average',3);
 fa=imfilter(f1,w,'replicate');
@@ -26,19 +26,17 @@ for i=1:length(id1_large)
 end
 ep=endpoints(g2);
 [lox,loy]=find(ep==1);
-lox=int16(lox);
-loy=int16(loy);
 for i=1:length(lox)
     t1=lox(i);
     t2=loy(i);
-    if ((5<t1) && (t1<size(ep,1)-5) && (10<t2) && (t2<size(ep,2)-10) && (ep(t1,t2)==1))
-       patch=ep(t1-4:t1+4,t2-4:t2+4);
+    if ((15<t1) && (t1<size(ep,1)-15) && (15<t2) && (t2<size(ep,2)-15) && (ep(t1,t2)==1))
+       patch=ep(t1-15:t1+15,t2-15:t2+15);
        ep(t1,t2)=0;
-       patch(5,5)=0;
+       patch(16,16)=0;
        [neighx,neighy]=find(patch==1);
        if ~isempty(neighx)
-           rx=neighx-5;
-           ry=neighy-5;
+           rx=neighx-16;
+           ry=neighy-16;
            [min_d,l]=min(abs(rx)+abs(ry));
            rx=rx(l);
            ry=ry(l);
@@ -109,13 +107,13 @@ if m1<m2
         m_1=max(col_vec_1);
         if m_1==1
             id5=find(col_vec_1==1);
-            g9(min(id5),i)=1;
+            g9(max(id5),i)=1;
         end
         col_vec_2=g8(:,i);
         m_2=max(col_vec_2);
         if m_2==1
             id6=find(col_vec_2==1);
-            g10(max(id6),i)=1;
+            g10(min(id6),i)=1;
         end
     end
 else 
@@ -124,13 +122,13 @@ else
         m_1=max(col_vec_1);
         if m_1==1
             id5=find(col_vec_1==1);
-            g9(min(id5),i)=1;
+            g9(max(id5),i)=1;
         end
         col_vec_2=g7(:,i);
         m_2=max(col_vec_2);
         if m_2==1
             id6=find(col_vec_2==1);
-            g10(max(id6),i)=1;
+            g10(min(id6),i)=1;
         end
     end
 end
