@@ -1,5 +1,5 @@
 clear;clc
-f1=imread('20.bmp');
+f1=imread('15.2.bmp');
 f1=f1(70:730,206:818);
 w=fspecial('average',3);
 fa=imfilter(f1,w,'replicate');
@@ -63,7 +63,7 @@ idx2=cell(numc,1);
 for i=1:numc
     idx2{i}=find(Lc==i);
     [I,J]=ind2sub(size(g1),idx2{i});
-    if max(J)-min(J)<0.8*size(g2,2)
+    if max(J)-min(J)<0.5*size(g2,2)
         idx2{i}=[];
     end
 end
@@ -83,63 +83,47 @@ for i=1:length(idx3)
     idx3{i}=sub2ind(size(g1),idx3{i}(:,1),idx3{i}(:,2));
 end
 [sloc,id2]=sort(loc);
-sloc_d=diff(sloc);
-[m,id3]=max(sloc_d);
-g5=zeros(size(g4));
-g5(idx3{id2(id3)})=1;
-g5(idx3{id2(id3+1)})=1;
-g6=bwmorph(g5,'thin',inf);
-[L1,num1]=bwlabel(g6);
-[I1,J1]=find(L1==1);
-[I2,J2]=find(L1==2);
-m1=mean(I1);
-m2=mean(I2);
-g7=zeros(size(g6));
-id4=sub2ind(size(g6),I1,J1);
-g7(id4)=1;
-g8=zeros(size(g7));
-id5=sub2ind(size(g6),I2,J2);
-g8(id5)=1;
-g9=zeros(size(g6));
-g10=g9;
-if m1<m2
-    for i=1:size(g7,2)
-        col_vec_1=g7(:,i);
+loc_d=diff(sloc);
+[sloc_d,id3]=sort(loc_d,'descend');
+for i=1:3
+   g5=zeros(size(g4));
+   g6=zeros(size(g4));
+   g7=zeros(size(g4));
+   g8=zeros(size(g4));
+   g5(idx3{id2(id3(i))})=1;
+   g6(idx3{id2(id3(i)+1)})=1;
+   for j=1:size(g5,2)
+        col_vec_1=g5(:,j);
         m_1=max(col_vec_1);
         if m_1==1
             id5=find(col_vec_1==1);
-            g9(max(id5),i)=1;
+            g7(max(id5),j)=1;
         end
-        col_vec_2=g8(:,i);
+        col_vec_2=g6(:,j);
         m_2=max(col_vec_2);
         if m_2==1
             id6=find(col_vec_2==1);
-            g10(min(id6),i)=1;
+            g8(min(id6),j)=1;
         end
     end
-else 
-    for i=1:size(g8,2)
-        col_vec_1=g8(:,i);
-        m_1=max(col_vec_1);
-        if m_1==1
-            id5=find(col_vec_1==1);
-            g9(max(id5),i)=1;
-        end
-        col_vec_2=g7(:,i);
-        m_2=max(col_vec_2);
-        if m_2==1
-            id6=find(col_vec_2==1);
-            g10(min(id6),i)=1;
-        end
+    g9=g7|g8;
+    [r1,c1]=find(g7==1);
+    [r2,c2]=find(g8==1);
+    cmin=max(min(c1),min(c2));
+    cmax=min(max(c1),max(c2));
+    num_g=0;
+    gray=0;
+    for k=cmin:cmax
+        num_g=num_g+find(g8(:,k)==1)-find(g7(:,k)==1);
+        gray=gray+sum(f1(find(g7(:,k)==1):find(g8(:,k)==1),k));
+    end
+    avg=gray/num_g;
+    if avg<35
+        break;
     end
 end
-g11=g9 | g10;
-f2=zeros(size(f1));    
-f3=f2;
-f2=g9;
-f3=g10;
-[r1,c1]=find(f2==1);
-[r2,c2]=find(f3==1);
+    
+
 imshow(f1);
 hold on
 plot(c1,r1,'r');
