@@ -1,11 +1,11 @@
 clear;clc
-f1=imread('15.2.bmp');
+f1=imread('49.bmp');
 f1=f1(70:730,206:818);
 w=fspecial('average',3);
 fa=imfilter(f1,w,'replicate');
 T=graythresh(fa);
 g=im2bw(fa,T);
-g1=edge(g,'canny');
+g1=edge(g,'sobel');
 g1=bwmorph(g1,'thin',inf);
 [L,num]=bwlabel(g1);
 len=zeros(num,1);
@@ -85,6 +85,7 @@ end
 [sloc,id2]=sort(loc);
 loc_d=diff(sloc);
 [sloc_d,id3]=sort(loc_d,'descend');
+cou=0;
 for i=1:3
    g5=zeros(size(g4));
    g6=zeros(size(g4));
@@ -118,11 +119,27 @@ for i=1:3
         gray=gray+sum(f1(find(g7(:,k)==1):find(g8(:,k)==1),k));
     end
     avg=gray/num_g;
-    if avg<35
+    if avg<40
         break;
     end
+    cou=cou+1;
 end
-    
+if cou==3 || sloc_d(i)<60
+    g5=zeros(size(g4));
+    g7=zeros(size(g4));
+    g5(idx3{id2(length(idx3))})=1;
+    for j=1:size(g5,2)
+        col_vec_1=g5(:,j);
+        m_1=max(col_vec_1);
+        if m_1==1
+            id5=find(col_vec_1==1);
+            g7(max(id5),j)=1;
+        end
+    end
+    [r1,c1]=find(g7==1);
+    r2=[];
+    c2=[];
+end
 
 imshow(f1);
 hold on
