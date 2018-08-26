@@ -124,9 +124,10 @@ for i=1:3
     end
     cou=cou+1;
 end
-if cou==2 && 
+if cou==3 || sloc_d(i)<60
     g5=zeros(size(g4));
-    g5(idx3{length(idx3)})=1;
+    g7=zeros(size(g4));
+    g5(idx3{id2(length(idx3))})=1;
     for j=1:size(g5,2)
         col_vec_1=g5(:,j);
         m_1=max(col_vec_1);
@@ -136,8 +137,25 @@ if cou==2 &&
         end
     end
     [r1,c1]=find(g7==1);
-    r2=[];
-    c2=[];
+    g8=zeros(size(g2));
+    for k=1:length(r1)
+        col_vec_2=g2(:,c1(k));
+        col_vec_2(1:r1(k))=0;
+        m_2=max(col_vec_2);
+        if m_2==1
+            id6=find(col_vec_2==1);
+            id6=(id6-r1(k)>50).*id6;
+            id6= (id6-r1(k)<200).*id6;
+            id6(find(id6==0))=[];
+            g8(min(id6),c1(k))=1;
+        end
+    end
+    [r2,c2]=find(g8==1);
+    dif_r2=diff(r2);
+    abn=find((diff(r2)>50)==1);
+    r2(1:abn)=[];
+    c2(1:abn)=[];
+            
 end
 
 imshow(f1);
